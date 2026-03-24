@@ -519,6 +519,13 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Build share URLs for this activity
+    const shareUrl = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
+    const shareText = `Check out ${name} at Mergington High School!`;
+    const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText + " " + shareUrl)}`;
+
     activityCard.innerHTML = `
       ${tagHtml}
       <h4>${name}</h4>
@@ -569,6 +576,13 @@ document.addEventListener("DOMContentLoaded", () => {
         `
         }
       </div>
+      <div class="share-section">
+        <span class="share-label">Share:</span>
+        <a class="share-button share-twitter" href="${xUrl}" target="_blank" rel="noopener noreferrer" title="Share on X (Twitter)" aria-label="Share on X (Twitter)">𝕏</a>
+        <a class="share-button share-facebook" href="${facebookUrl}" target="_blank" rel="noopener noreferrer" title="Share on Facebook" aria-label="Share on Facebook">f</a>
+        <a class="share-button share-whatsapp" href="${whatsappUrl}" target="_blank" rel="noopener noreferrer" title="Share on WhatsApp" aria-label="Share on WhatsApp">W</a>
+        <button class="share-button share-copy" data-url="${shareUrl}" title="Copy link" aria-label="Copy link">&#x1F517;</button>
+      </div>
     `;
 
     // Add click handlers for delete buttons
@@ -586,6 +600,28 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add click handler for the Copy Link share button
+    const copyButton = activityCard.querySelector(".share-copy");
+    copyButton.addEventListener("click", () => {
+      const url = copyButton.dataset.url;
+      navigator.clipboard.writeText(url).then(() => {
+        const original = copyButton.innerHTML;
+        copyButton.innerHTML = "✔";
+        copyButton.classList.add("share-copy-success");
+        setTimeout(() => {
+          copyButton.innerHTML = original;
+          copyButton.classList.remove("share-copy-success");
+        }, 1500);
+      }).catch(() => {
+        copyButton.title = "Copy not supported — please copy the URL from your browser's address bar";
+        copyButton.classList.add("share-copy-error");
+        setTimeout(() => {
+          copyButton.title = "Copy link";
+          copyButton.classList.remove("share-copy-error");
+        }, 2500);
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
